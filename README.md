@@ -1,2 +1,3 @@
-# contact_api
+# Contact API
+
 Message API for beantownpub.com
