@@ -1,3 +1,5 @@
 Dockerfile
 .google_creds.json
 .git/
+.gitignore
+.dockerignore
