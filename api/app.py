@@ -15,7 +15,9 @@ ORIGINS = [
     "http://localhost:3000",
     "http://localhost",
     "https://beantownpub.com",
-    "https://dev.beantownpub.com"
+    "https://dev.beantownpub.com",
+    "https://www.beantownpub.com",
+    "https://beantown.dev.jalgraves.com"
 ]
 
 LOG_LEVEL = os.environ.get('CONTACT_API_LOG_LEVEL', 'INFO')
