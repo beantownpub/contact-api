@@ -38,6 +38,7 @@ init_routes(API)
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
+    gunicorn_logger.addHandler(logging.StreamHandler())
     APP.logger.handlers = gunicorn_logger.handlers
     APP.logger.setLevel(LOG_LEVEL)
 
