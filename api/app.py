@@ -10,6 +10,7 @@ from api.resources.routes import init_routes
 class ContactAPIException(Exception):
     """Base class for merch API exceptions"""
 
+
 ORIGINS = [
     "https://beantown.jalgraves.com",
     "http://localhost:3000",

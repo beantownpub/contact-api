@@ -1,0 +1,9 @@
+boto3
+flask
+flask-cors
+flask-restful
+gunicorn
+pytz
+requests
+google-auth-oauthlib
+google-api-python-client

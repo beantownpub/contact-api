@@ -1,5 +1,7 @@
 .PHONY: all test clean
 
+tag ?= latest
+
 build:
 		@echo "\033[1;32m. . . Building Contact API image . . .\033[1;37m\n"
 		docker build -t contact_api .
@@ -9,8 +11,8 @@ build_no_cache:
 		docker build -t contact_api . --no-cache=true
 
 publish: build
-		docker tag contact_api jalgraves/contact_api
-		docker push jalgraves/contact_api
+		docker tag contact_api jalgraves/contact_api:$(tag)
+		docker push jalgraves/contact_api:$(tag)
 
 start:
 		@echo "\033[1;32m. . . Starting Contact API container . . .\033[1;37m\n"
@@ -25,6 +27,9 @@ start:
 			-e EMAIL_SENDER=${CONTACT_API_EMAIL_SENDER} \
 			-e EMAIL_RECIPIENT=${CONTACT_API_EMAIL_RECIPIENT} \
 			-e CONTACT_GMAIL_PASSWORD=${CONTACT_API_GMAIL_PASSWORD} \
+			-e AWS_ACCESS_KEY_ID=${AWS_KEY_ID} \
+			-e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+			-e AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
 			contact_api
 
 stop:
