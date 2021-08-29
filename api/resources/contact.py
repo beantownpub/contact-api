@@ -23,13 +23,13 @@ def aws_send_email(body):
         "email": body.get('email', 'Not Provided'),
         "event_date": body.get('event_date', 'Not Provided'),
         "details": body.get('details', 'Not Provided'),
-        "location": body.get('location')
+        "location": body.get('location'),
+        "catering": body.get('catering')
     }
     app_log.info('- aws_send_email | Message info: %s', message_info)
     recipient = os.environ.get('EMAIL_RECIPIENT')
     email = awsContactEmail(message_info, recipient)
-    response = email.send_message()
-    return response
+    email.send_message()
 
 
 def slack_message(body):
@@ -69,14 +69,18 @@ class EventContactAPI(Resource):
     ]
 
     def get(self, location):
-        version = {"app": "contact_api", "version": "0.1.0", "location": location}
+        version = {"app": "contact_api", "version": "0.1.3", "location": location}
         app_log.info('- ContactAPI | Version: %s', version)
         return Response(json.dumps(version), mimetype='application/json', status=200)
 
     def post(self, location):
         body = request.get_json()
         body['location'] = location
-        app_log.info('- ContactAPI | Location: %s', location)
+        app_log.info('Body: %s', body)
+        if 'catering' in body.keys():
+            app_log.info('Catering: %s', body['catering'])
+            if not body['catering']:
+                body['catering'] = 'No'
         aws_send_email(body)
         if slack_message(body) == 200:
             data = {'msg': self.success}

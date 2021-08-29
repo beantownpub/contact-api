@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.0.0
+  version: 0.1.3
   title: Contact API
   description: An API for contacting Beantown
 
@@ -111,6 +111,8 @@ components:
           type: string
         details:
           type: string
+        catering:
+          type: any
   parameters:
     PageLimit:
       name: limit

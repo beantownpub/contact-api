@@ -116,27 +116,35 @@ class awsContactEmail:
         body = """<html>
         <head></head>
         <body>
-            <h3>Beantown Pub Private Event Contact</h3>
+            <h3>{} Private Event Contact</h3>
             <table>
                 <tr><td><strong>Name:</strong></td><td>{}</td></tr>
                 <tr><td><strong>Phone:</strong></td><td>{}</td></tr>
                 <tr><td><strong>Email:</strong></td><td>{}</td></tr>
                 <tr><td><strong>Details:</strong></td><td>{}</td></tr>
+                <tr><td><strong>Catering:</strong></td><td>{}</td></tr>
             </table>
         </body>
         </html>
-        """.format(info['name'], info['phone_number'], info['email'], info['details'])
+        """.format(
+                info['location'].title(),
+                info['name'],
+                info['phone_number'],
+                info['email'],
+                info['details'],
+                info['catering'])
         return body
 
     def _build_body_text(self):
         '''Build plain text message'''
 
         body_text = [
-            "Beantown Event Contact",
+            f"{self.contact_info['location'].title()} Event Contact",
             f"Name: {self.contact_info['name']}",
             f"Phone: {self.contact_info['phone_number']}",
             f"Email: {self.contact_info['email']}",
-            f"Details: {self.contact_info['details']}"
+            f"Details: {self.contact_info['details']}",
+            f"Catering: {self.contact_info['catering']}"
         ]
         return "\n".join(body_text)
 
@@ -159,7 +167,8 @@ def main():
         "details": "This is a test contact message",
         "location": "beantown"
     }
-    email = awsContactEmail(info, 'jalgraves@gmail.com')
+    recipient = os.environ.get('TEST_EMAIL_RECIPIENT')
+    email = awsContactEmail(info, recipient)
     response = email.send_message()
     print(response)
 

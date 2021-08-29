@@ -1,6 +1,8 @@
 .PHONY: all test clean
 
-tag ?= latest
+email_recipient ?= ${CONTACT_API_EMAIL_RECIPIENT}
+second_recipient ?= ${CONTACT_API_EMAIL_SECOND_RECIPIENT}
+tag ?= $(shell yq eval '.info.version' swagger.yaml)
 
 build:
 		@echo "\033[1;32m. . . Building Contact API image . . .\033[1;37m\n"
@@ -25,8 +27,7 @@ start:
 			-e SLACK_WEBHOOK_CHANNEL=${CONTACT_API_SLACK_WEBHOOK_CHANNEL} \
 			-e SLACK_WEBHOOK_USER=${CONTACT_API_SLACK_WEBHOOK_USER} \
 			-e EMAIL_SENDER=${CONTACT_API_EMAIL_SENDER} \
-			-e EMAIL_RECIPIENT=${CONTACT_API_EMAIL_RECIPIENT} \
-			-e CONTACT_GMAIL_PASSWORD=${CONTACT_API_GMAIL_PASSWORD} \
+			-e EMAIL_RECIPIENT=$(email_recipient) \
 			-e AWS_ACCESS_KEY_ID=${AWS_KEY_ID} \
 			-e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
 			-e AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
