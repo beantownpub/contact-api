@@ -3,18 +3,15 @@
 email_recipient ?= ${CONTACT_API_EMAIL_RECIPIENT}
 second_recipient ?= ${CONTACT_API_EMAIL_SECOND_RECIPIENT}
 tag ?= $(shell yq eval '.info.version' swagger.yaml)
+image ?= contact_api
 
 build:
 		@echo "\033[1;32m. . . Building Contact API image . . .\033[1;37m\n"
-		docker build -t contact_api .
-
-build_no_cache:
-		@echo "\033[1;32m. . . No cache Contact API image build . . .\033[1;37m\n"
-		docker build -t contact_api . --no-cache=true
+		docker build -t $(image):$(tag) .
 
 publish: build
-		docker tag contact_api jalgraves/contact_api:$(tag)
-		docker push jalgraves/contact_api:$(tag)
+		docker tag $(image):$(tag) jalgraves/$(image):$(tag)
+		docker push jalgraves/$(image):$(tag)
 
 start:
 		@echo "\033[1;32m. . . Starting Contact API container . . .\033[1;37m\n"
@@ -31,7 +28,7 @@ start:
 			-e AWS_ACCESS_KEY_ID=${AWS_KEY_ID} \
 			-e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
 			-e AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
-			contact_api
+			$(image):$(tag)
 
 stop:
 		docker rm -f contact_api || true

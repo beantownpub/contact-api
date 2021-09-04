@@ -4,9 +4,11 @@ import os
 
 import requests
 from flask import Response, request
+from flask_httpauth import HTTPBasicAuth
 from flask_restful import Resource
 from .libs.aws_email import awsContactEmail
 
+AUTH = HTTPBasicAuth()
 
 app_log = logging.getLogger()
 
@@ -14,6 +16,14 @@ if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app_log.handlers = gunicorn_logger.handlers
     app_log.setLevel('INFO')
+
+
+@AUTH.verify_password
+def verify_password(username, password):
+    app_log.info("Verifying user %s", username)
+    if password == os.environ.get("API_PASSWORD"):
+        return True
+    return False
 
 
 def aws_send_email(body):
@@ -68,11 +78,13 @@ class EventContactAPI(Resource):
         'If error persists email request to beantownpubboston@gmail.com'
     ]
 
+    @AUTH.login_required
     def get(self, location):
-        version = {"app": "contact_api", "version": "0.1.3", "location": location}
+        version = {"app": "contact_api", "version": "0.1.4", "location": location}
         app_log.info('- ContactAPI | Version: %s', version)
         return Response(json.dumps(version), mimetype='application/json', status=200)
 
+    @AUTH.login_required
     def post(self, location):
         body = request.get_json()
         body['location'] = location
