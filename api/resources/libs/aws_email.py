@@ -54,8 +54,8 @@ def _send_message(recipient, body, text, subject, sender):
 
 
 class awsConformationEmail:
-    '''Class for sending a confirmation email for a merch order
-    '''
+    """Class for sending a confirmation email for a merch order
+    """
 
     subject = "Beantown Pub Merch Order Confirmation"
     sender = "Beantown Merch <orders@beantownpub.com>"
@@ -95,6 +95,9 @@ class awsConformationEmail:
 
 
 class awsContactEmail:
+    """Class for sending an email for a private event request
+    """
+
     sender = "Beantown Event <contact@beantownpub.com>"
 
     def __init__(self, contact_info, recipient):
@@ -103,40 +106,31 @@ class awsContactEmail:
 
     def _build_subject(self):
         location = self.contact_info.get('location')
-        if location:
-            subject = f"{location.title()} Private Event Contact"
-        else:
-            subject = "Beantown Private Event Contact"
+        subject = f"{location.title()} Private Event Contact"
         return subject
 
     def _build_body(self):
         info = self.contact_info
         if len(info['phone_number']) == 10:
             info['phone_number'] = f"{info['phone_number'][0:3]}-{info['phone_number'][3:6]}-{info['phone_number'][6:]}"
-        body = """<html>
+        body = f"""<html>
         <head></head>
         <body>
-            <h3>{} Private Event Contact</h3>
+            <h3>{info['location'].title()} Private Event Contact</h3>
             <table>
-                <tr><td><strong>Name:</strong></td><td>{}</td></tr>
-                <tr><td><strong>Phone:</strong></td><td>{}</td></tr>
-                <tr><td><strong>Email:</strong></td><td>{}</td></tr>
-                <tr><td><strong>Details:</strong></td><td>{}</td></tr>
-                <tr><td><strong>Catering:</strong></td><td>{}</td></tr>
+                <tr><td><strong>Name:</strong></td><td>{info['name']}</td></tr>
+                <tr><td><strong>Phone:</strong></td><td>{info['phone_number']}</td></tr>
+                <tr><td><strong>Email:</strong></td><td>{info['email']}</td></tr>
+                <tr><td><strong>Details:</strong></td><td>{info['details']}</td></tr>
+                <tr><td><strong>Catering:</strong></td><td>{info['catering']}</td></tr>
             </table>
         </body>
         </html>
-        """.format(
-                info['location'].title(),
-                info['name'],
-                info['phone_number'],
-                info['email'],
-                info['details'],
-                info['catering'])
+        """
         return body
 
     def _build_body_text(self):
-        '''Build plain text message'''
+        """Build plain text message"""
 
         body_text = [
             f"{self.contact_info['location'].title()} Event Contact",
@@ -157,21 +151,3 @@ class awsContactEmail:
             self._build_subject(),
             self.sender
         )
-
-
-def main():
-    info = {
-        "name": "jonny test",
-        "phone_number": "5558776543",
-        "email": "jonny@test.com",
-        "details": "This is a test contact message",
-        "location": "beantown"
-    }
-    recipient = os.environ.get('TEST_EMAIL_RECIPIENT')
-    email = awsContactEmail(info, recipient)
-    response = email.send_message()
-    print(response)
-
-
-if __name__ == '__main__':
-    main()

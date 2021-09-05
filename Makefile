@@ -4,14 +4,15 @@ email_recipient ?= ${CONTACT_API_EMAIL_RECIPIENT}
 second_recipient ?= ${CONTACT_API_EMAIL_SECOND_RECIPIENT}
 tag ?= $(shell yq eval '.info.version' swagger.yaml)
 image ?= contact_api
+repo ?= ${DOCKER_REPO}
 
 build:
 		@echo "\033[1;32m. . . Building Contact API image . . .\033[1;37m\n"
 		docker build -t $(image):$(tag) .
 
 publish: build
-		docker tag $(image):$(tag) jalgraves/$(image):$(tag)
-		docker push jalgraves/$(image):$(tag)
+		docker tag $(image):$(tag) $(repo)/$(image):$(tag)
+		docker push $(repo)/$(image):$(tag)
 
 start:
 		@echo "\033[1;32m. . . Starting Contact API container . . .\033[1;37m\n"

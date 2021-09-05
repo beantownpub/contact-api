@@ -1,0 +1,11 @@
+{
+    "message_info": {
+        "name": "Jonny Test",
+        "phone_number": "5556661234",
+        "email": "jtest@fake.com",
+        "event_date": "Not provided",
+        "details": "This is a test message",
+        "location": "beantown",
+        "catering": "Yes"
+    }
+}
