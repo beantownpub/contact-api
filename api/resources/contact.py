@@ -80,7 +80,7 @@ class EventContactAPI(Resource):
 
     @AUTH.login_required
     def get(self, location):
-        version = {"app": "contact_api", "version": "0.1.4", "location": location}
+        version = {"app": "contact_api", "version": "0.1.7", "location": location}
         app_log.info('- ContactAPI | Version: %s', version)
         return Response(json.dumps(version), mimetype='application/json', status=200)
 
@@ -93,8 +93,9 @@ class EventContactAPI(Resource):
             app_log.info('Catering: %s', body['catering'])
             if not body['catering']:
                 body['catering'] = 'No'
+        slack_status = slack_message(body)
         aws_send_email(body)
-        if slack_message(body) == 200:
+        if slack_status == 200:
             data = {'msg': self.success}
         else:
             data = {'msg': ' '.join(self.failure)}

@@ -22,4 +22,4 @@ WORKDIR /opt/app
 
 EXPOSE 5012
 
-CMD ["gunicorn", "-w 2", "-b :5012", "server:APP"]
+CMD ["gunicorn", "-w 1", "-b :5012", "server:APP"]
