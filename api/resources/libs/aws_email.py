@@ -1,24 +1,23 @@
-import logging
 import os
 import boto3
 from botocore.exceptions import ClientError
 
-app_log = logging.getLogger()
+from api.libs.logging import init_logger
+from api.libs.templates import confirmation_email
 
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app_log.handlers = gunicorn_logger.handlers
-    app_log.setLevel('INFO')
-
+LOG = init_logger(os.environ.get('LOG_LEVEL'))
 AWS_REGION = os.environ.get('AWS_DEFAULT_REGION')
 CHARSET = "UTF-8"
+
+class OrderConfirmationException(Exception):
+    """Base class for order confirmation exceptions"""
 
 
 client = boto3.client('ses', region_name=AWS_REGION)
 
 
 def _send_message(recipient, body, text, subject, sender):
-    app_log.info('_send_message sending email to %s from %s', recipient, sender)
+    LOG.info('_send_message sending email to %s from %s', recipient, sender)
     second_recipient = os.environ.get("SECOND_EMAIL_RECIPIENT")
     if second_recipient:
         recipients = [recipient, second_recipient, ]
@@ -48,53 +47,76 @@ def _send_message(recipient, body, text, subject, sender):
             Source=sender,
         )
     except ClientError as e:
-        app_log.error('AWS Error: %s', e)
-    app_log.info('- AWS response: %s', response)
+        LOG.error('AWS Error: %s', e)
+    LOG.info('- AWS response: %s', response)
     return response
 
 
-class awsConformationEmail:
+class OrderConfirmation:
     """Class for sending a confirmation email for a merch order
     """
-
+    support_email = os.environ.get('SUPPORT_EMAIL_ADDRESS')
+    support_phone = os.environ.get('SUPPORT_PHONE_NUMBER')
+    shipping_price = os.environ.get('SHIPPING_PRICE', 6.99)
     subject = "Beantown Pub Merch Order Confirmation"
     sender = "Beantown Merch <orders@beantownpub.com>"
 
-    def __init__(self, order_id, recipient):
-        self.order_id = order_id
-        self.recipient = recipient
+    def __init__(self, order_info):
+        self.order_info = order_info
+        self.recipient = order_info["order"]["email"]
+        self.order_id = order_info["payment"]["order_id"]
+        self.order_items = order_info["order"]["cart"]["cart_items"]
+        self.items_total = order_info["order"]["cart"]["total"]
+        self.order_total = round(self.items_total + self.shipping_price, 2)
+
+    def _parse_items(self):
+        if not self.order_items:
+            raise OrderConfirmationException("No items in this order %s", self.order_id)
+        item_html = []
+        for item in self.order_items:
+            if item.get('size'):
+                item_html.append(f"<tr><td>{item['name']}</td><td>{item['size']}</td><td>{item['quantity']}</td><td>{item['price']}</td><td>{item['total']}</td></tr>")
+            else:
+                item_html.append(f"<tr><td>{item['name']}</td><td></td><td>{item['quantity']}</td><td>{item['price']}</td><td>{item['total']}</td></tr>")
+        return "\n".join(item_html)
+
 
     def _build_body(self):
-        body = """<html>
-        <head></head>
-        <body>
-            <h1>Beantown Pub Merch Order Confirmation</h1>
-            <table>
-                <tr><td>Order ID</td><td>{}</td></tr>
-            </table>
-        </body>
-        </html>
-        """.format(self.order_id)
+        body = confirmation_email.format(
+                self.order_id,
+                self._parse_items(),
+                self.items_total,
+                self.shipping_price,
+                self.order_total,
+                self.support_email,
+                self.support_phone
+            )
         return body
 
-    def _build_body_text(self):
+    def _build_raw_text(self):
+        """Build plain text message"""
         body_text = [
-            "Thank you for your order!",
-            "Have a nice day!"
+            f"Confirmation code: {self.order_id}",
+            f"Items: {self.order_items}",
+            f"Order total: {self.order_total}",
+            "Questions?",
+            f"Email: {self.support_email}",
+            f"Call: {self.support_phone}"
         ]
-        return body_text
+        return "\n".join(body_text)
 
     def send_message(self):
+        LOG.info("Sending order confirmation email to %s", self.recipient)
         _send_message(
             self.recipient,
             self._build_body(),
-            self._build_body_text(),
+            self._build_raw_text(),
             self.subject,
             self.sender
         )
 
 
-class awsContactEmail:
+class EventRequest:
     """Class for sending an email for a private event request
     """
 
@@ -129,7 +151,7 @@ class awsContactEmail:
         """
         return body
 
-    def _build_body_text(self):
+    def _build_raw_text(self):
         """Build plain text message"""
 
         body_text = [
@@ -143,11 +165,11 @@ class awsContactEmail:
         return "\n".join(body_text)
 
     def send_message(self):
-        app_log.info('Sending AWS Email from %s', self.sender)
+        LOG.info('Sending AWS Email from %s', self.sender)
         _send_message(
             self.recipient,
             self._build_body(),
-            self._build_body_text(),
+            self._build_raw_text(),
             self._build_subject(),
             self.sender
         )

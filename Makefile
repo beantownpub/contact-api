@@ -1,39 +1,53 @@
 .PHONY: all test clean
 
-email_recipient ?= ${CONTACT_API_EMAIL_RECIPIENT}
-second_recipient ?= ${CONTACT_API_EMAIL_SECOND_RECIPIENT}
+name ?= contact-api
+image ?= $(name)
+port ?= 5012
+repo ?= jalgraves
 tag ?= $(shell yq eval '.info.version' swagger.yaml)
-image ?= contact_api
-repo ?= ${DOCKER_REPO}
+hash = $(shell git rev-parse --short HEAD)
+
+ifeq ($(env),dev)
+	image_tag = $(tag)-$(hash)
+	context = ${DEV_CONTEXT}
+	namespace = ${DEV_NAMESPACE}
+else ifeq ($(env),prod)
+    image_tag = $(tag)
+	context = ${PROD_CONTEXT}
+	namespace = ${PROD_NAMESPACE}
+else
+	env := dev
+endif
+
+context:
+	kubectl config use-context $(context)
+
+compile:
+	cp requirements.txt prev-requirements.txt
+	pip-compile requirements.in
 
 build:
-		@echo "\033[1;32m. . . Building Contact API image . . .\033[1;37m\n"
-		docker build -t $(image):$(tag) .
+	@echo "\033[1;32m. . . Building Contact API image . . .\033[1;37m\n"
+	docker build -t $(image):$(image_tag) .
 
 publish: build
-		docker tag $(image):$(tag) $(repo)/$(image):$(tag)
-		docker push $(repo)/$(image):$(tag)
+	docker tag $(image):$(image_tag) $(repo)/$(image):$(image_tag)
+	docker push $(repo)/$(image):$(image_tag)
 
-start:
-		@echo "\033[1;32m. . . Starting Contact API container . . .\033[1;37m\n"
-		docker run \
-			--name contact_api \
-			--restart always \
-			-p "5012:5012" \
-			-e DEBUG_CONTACT_API='True' \
-			-e SLACK_WEBHOOK_URL=${CONTACT_API_SLACK_WEBHOOK_URL} \
-			-e SLACK_WEBHOOK_CHANNEL=${CONTACT_API_SLACK_WEBHOOK_CHANNEL} \
-			-e SLACK_WEBHOOK_USER=${CONTACT_API_SLACK_WEBHOOK_USER} \
-			-e EMAIL_SENDER=${CONTACT_API_EMAIL_SENDER} \
-			-e EMAIL_RECIPIENT=$(email_recipient) \
-			-e AWS_ACCESS_KEY_ID=${AWS_KEY_ID} \
-			-e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
-			-e AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
-			$(image):$(tag)
+test:
+	python3 -m pytest test/
 
-stop:
-		docker rm -f contact_api || true
 clean:
-		rm -rf api/__pycache__ || true
-		rm .DS_Store || true
-		rm api/*.pyc
+	rm -rf api/__pycache__ || true
+	rm .DS_Store || true
+	rm api/*.pyc
+
+kill_pod: context
+	${HOME}/github/helm/scripts/kill_pod.sh $(env) $(name)
+
+kill_port_forward: context
+	${HOME}/github/helm/scripts/stop_port_forward.sh $(port)
+
+redeploy: build restart
+
+restart: kill_pod kill_port_forward

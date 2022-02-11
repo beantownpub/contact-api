@@ -4,6 +4,7 @@ from flask import Flask, request
 from flask_restful import Api
 from flask_cors import CORS
 
+from api.libs.logging import init_logger
 from api.resources.routes import init_routes
 
 
@@ -21,7 +22,7 @@ ORIGINS = [
     "https://beantown.dev.jalgraves.com"
 ]
 
-LOG_LEVEL = os.environ.get('CONTACT_API_LOG_LEVEL', 'INFO')
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
 APP = Flask(__name__.split('.')[0], instance_path='/opt/app/api')
 API = Api(APP)
 
@@ -35,14 +36,10 @@ cors = CORS(
     supports_credentials=True
 )
 
+LOG = init_logger(LOG_LEVEL)
+LOG.info('Logging initialized | Level %s', LOG_LEVEL)
 init_routes(API)
-
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    gunicorn_logger.addHandler(logging.StreamHandler())
-    APP.logger.handlers = gunicorn_logger.handlers
-    APP.logger.setLevel(LOG_LEVEL)
-
+LOG.info('Routes initialized')
 
 @APP.after_request
 def after_request(response):
