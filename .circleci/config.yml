@@ -11,4 +11,5 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            docker build -t contact_api .
+            sudo apt-get install -y yq
+            docker build -t contact_api:$(yq eval '.info.version' swagger.yaml) .
