@@ -18,10 +18,13 @@ class OrderConfirmationException(Exception):
 
 @AUTH.verify_password
 def verify_password(username, password):
-    LOG.info("Verifying user %s", username)
-    if password == os.environ.get("API_PASSWORD"):
-        return True
-    return False
+    api_username = os.environ.get("API_USERNAME")
+    api_password = os.environ.get("API_PASSWORD")
+    if username.strip() == api_username and password.strip() == api_password:
+        verified = True
+    else:
+        verified = False
+    return verified
 
 
 class EventContactAPI(Resource):
@@ -30,6 +33,7 @@ class EventContactAPI(Resource):
         'Error Sending Request. Please try again.',
         'If error persists email request to beantownpubboston@gmail.com'
     ]
+    recipient = os.environ.get('EMAIL_RECIPIENT')
 
     @AUTH.login_required
     def get(self, location):
@@ -42,14 +46,14 @@ class EventContactAPI(Resource):
         body = request.get_json()
         body['location'] = location
         LOG.info('Body: %s', body)
-        message = EventRequest(body)
+        message = EventRequest(body, self.recipient)
         slack_status = message.send_slack()
         message.send_email()
         if slack_status == 200:
             resp = {"status": 200, "response": self.success, "mimetype": "application/json"}
         else:
             LOG.error('Slack send exception | %s', slack_status)
-            resp = {"status": 200, "response": " ".join(self.failure), "mimetype": "application/json"}
+            resp = {"status": 400, "response": " ".join(self.failure), "mimetype": "application/json"}
         return Response(**resp)
 
     def options(self, location):

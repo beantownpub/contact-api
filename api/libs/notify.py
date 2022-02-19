@@ -1,9 +1,12 @@
 import os
 
+from datetime import datetime
+
 from api.libs.aws import send_message
 from api.libs.logging import init_logger
 from api.libs.templates import confirmation_email, event_request_html, event_request_raw
 from api.libs.slack import slack_message
+from api.libs.utils import add_creation_date
 
 LOG = init_logger(os.environ.get('LOG_LEVEL'))
 
@@ -14,12 +17,13 @@ class OrderConfirmationException(Exception):
 class OrderConfirmation:
     """Class for sending a confirmation email for a merch order
     """
+    slack_channel = os.environ.get('SLACK_ORDERS_CHANNEL')
+    slack_webhook_url = os.environ.get('SLACK_ORDERS_WEBHOOK_URL')
     support_email = os.environ.get('SUPPORT_EMAIL_ADDRESS')
     support_phone = os.environ.get('SUPPORT_PHONE_NUMBER')
     shipping_price = os.environ.get('SHIPPING_PRICE', 6.99)
     subject = "Beantown Pub Merch Order Confirmation"
     sender = "Beantown Merch <orders@beantownpub.com>"
-    slack_webhook_url = os.environ.get('SLACK_ORDERS_WEBHOOK_URL')
 
     def __init__(self, order_info, recipient=None):
         self.order_info = order_info
@@ -91,7 +95,7 @@ class OrderConfirmation:
 
     def send_slack(self):
         """Send message to Slack"""
-        response = slack_message(self.order_info, self.slack_webhook_url)
+        response = slack_message(self.slack_channel, self.order_info, self.slack_webhook_url)
         return response
 
 
@@ -100,13 +104,14 @@ class EventRequest:
     """
 
     sender = "Beantown Event <contact@beantownpub.com>"
+    slack_channel = os.environ.get('SLACK_PARTYS_CHANNEL')
     slack_webhook_url = os.environ.get('SLACK_PARTYS_WEBHOOK_URL')
 
     def __init__(self, contact_info, recipient):
-        self.contact_info = contact_info
+        self.contact_info = add_creation_date(contact_info)
         self.location = contact_info['location']
         self.name = contact_info['name']
-        self.phone_number = contact_info['phone_number']
+        self.phone_number = contact_info['phone']
         self.email = contact_info['email']
         self.details = contact_info['details']
         self.catering = contact_info['catering']
@@ -157,5 +162,6 @@ class EventRequest:
 
     def send_slack(self):
         """Send message to Slack"""
-        response = slack_message(self.contact_info, self.slack_webhook_url)
+        LOG.info('Sending Slack message | %s', self.contact_info)
+        response = slack_message(self.slack_channel, self.contact_info, self.slack_webhook_url)
         return response

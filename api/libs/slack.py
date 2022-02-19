@@ -16,10 +16,11 @@ class SlackSendException(Exception):
     """base class for slack message sending exceptions"""
 
 
-def slack_message(body, webhook_url):
-    LOG.info('| Slack notification | %s', body)
+def slack_message(channel, body, webhook_url):
+    LOG.debug('| Slack notification | %s', body)
     webhook = {
         "username": USER,
+        "channel": channel,
         "text": f"```{json.dumps(body, indent=2)}```"
     }
     response = []
