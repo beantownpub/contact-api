@@ -11,6 +11,6 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            sudo apt-get update -y
-            sudo apt-get install -y yq
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod a+x /usr/local/bin/yq
             docker build -t contact_api:$(yq eval '.info.version' swagger.yaml) .
