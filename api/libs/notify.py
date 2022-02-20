@@ -8,6 +8,7 @@ from api.libs.templates import confirmation_email, event_request_html, event_req
 from api.libs.slack import slack_message
 from api.libs.utils import add_creation_date
 
+DEFAULT_WEBHOOK = os.environ.get('SLACK_WEBHOOK_URL')
 LOG = init_logger(os.environ.get('LOG_LEVEL'))
 
 class OrderConfirmationException(Exception):
@@ -18,7 +19,7 @@ class OrderConfirmation:
     """Class for sending a confirmation email for a merch order
     """
     slack_channel = os.environ.get('SLACK_ORDERS_CHANNEL')
-    slack_webhook_url = os.environ.get('SLACK_ORDERS_WEBHOOK_URL')
+    slack_webhook_url = os.environ.get('SLACK_ORDERS_WEBHOOK_URL', DEFAULT_WEBHOOK)
     support_email = os.environ.get('SUPPORT_EMAIL_ADDRESS')
     support_phone = os.environ.get('SUPPORT_PHONE_NUMBER')
     shipping_price = os.environ.get('SHIPPING_PRICE', 6.99)
@@ -105,7 +106,7 @@ class EventRequest:
 
     sender = "Beantown Event <contact@beantownpub.com>"
     slack_channel = os.environ.get('SLACK_PARTYS_CHANNEL')
-    slack_webhook_url = os.environ.get('SLACK_PARTYS_WEBHOOK_URL')
+    slack_webhook_url = os.environ.get('SLACK_PARTYS_WEBHOOK_URL', DEFAULT_WEBHOOK)
 
     def __init__(self, contact_info, recipient):
         self.contact_info = add_creation_date(contact_info)
