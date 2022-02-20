@@ -6,6 +6,8 @@
 #
 aniso8601==8.1.0
     # via flask-restful
+attrs==21.4.0
+    # via pytest
 boto3==1.16.35
     # via -r requirements.in
 botocore==1.19.35
@@ -34,6 +36,8 @@ gunicorn==20.0.4
     # via -r requirements.in
 idna==2.10
     # via requests
+iniconfig==1.1.1
+    # via pytest
 itsdangerous==1.1.0
     # via flask
 jinja2==2.11.3
@@ -44,6 +48,16 @@ jmespath==0.10.0
     #   botocore
 markupsafe==1.1.1
     # via jinja2
+packaging==21.3
+    # via pytest
+pluggy==1.0.0
+    # via pytest
+py==1.11.0
+    # via pytest
+pyparsing==3.0.7
+    # via packaging
+pytest==7.0.1
+    # via -r requirements.in
 python-dateutil==2.8.1
     # via botocore
 pytz==2020.4
@@ -59,6 +73,8 @@ six==1.15.0
     #   flask-cors
     #   flask-restful
     #   python-dateutil
+tomli==2.0.1
+    # via pytest
 urllib3==1.26.5
     # via
     #   botocore

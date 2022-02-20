@@ -23,8 +23,8 @@ commands:
     description: Install pytest for running tests
     steps:
       - run:
-          name: Install pytest
-          command: pip install pytest
+          name: Install dependencies
+          command: pip install -r requirements.txt
 
 jobs:
   run_tests:
@@ -66,4 +66,6 @@ workflows:
   build_and_publish:
     jobs:
       - run_tests
-      - build_and_publish
+      - build_and_publish:
+          requires:
+            - run_tests

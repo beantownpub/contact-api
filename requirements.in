@@ -5,4 +5,5 @@ flask-httpauth
 flask-restful
 gunicorn
 pytz
+pytest
 requests
