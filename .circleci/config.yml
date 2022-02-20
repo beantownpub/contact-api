@@ -38,7 +38,6 @@ commands:
             kubectl config set-cluster prod --server=$K8S_SERVER --insecure-skip-tls-verify=true
             kubectl config set-context jalbot --cluster=prod --user=jalbot
             kubectl config use-context jalbot
-            kubectl get pods -n prod
       - run:
           name: Install helm
           command: |
@@ -97,6 +96,7 @@ jobs:
       - run:
           name: Deploy contact-api
           command: |
+            helm repo update
             helm template beantown/contact-api \
               --namespace prod \
               --set global.env=prod \
