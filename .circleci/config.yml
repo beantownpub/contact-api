@@ -1,11 +1,15 @@
 version: 2.1
-jobs:
-  build:
+executors:
+  build_machine:
     machine:
       image: ubuntu-1604:202007-01
     environment:
       DOCKER_BUILDKIT: 1
       BUILDX_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6
+
+jobs:
+  build:
+    executor: build_machine
     steps:
       - checkout
       - run:
@@ -13,4 +17,36 @@ jobs:
           command: |
             sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
             sudo chmod a+x /usr/local/bin/yq
-            docker build -t contact_api:$(yq eval '.info.version' swagger.yaml) .
+            export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
+            docker build -t contact_api:$CONTACT_API_VERSION .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  publish:
+    executor: build_machine
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Demonstrate that Mongo DB is available as localhost
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
+            docker tag contact_api:$CONTACT_API_VERSION jalgraves/contact_api:$CONTACT_API_VERSION
+            docker push jalgraves/contact_api:$CONTACT_API_VERSION
+
+workflows:
+  version: 2
+  build_and_publish:
+    jobs:
+      - build
+      - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+
+
+
