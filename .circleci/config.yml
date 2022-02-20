@@ -38,11 +38,12 @@ commands:
             kubectl config set-cluster prod --server=$K8S_SERVER --insecure-skip-tls-verify=true
             kubectl config set-context jalbot --cluster=prod --user=jalbot
             kubectl config use-context jalbot
+            kubectl get pods -n prod
       - run:
           name: Install helm
           command: |
-            curl https://baltocdn.com/helm/signing.asc | apt-key add -
             apt-get install apt-transport-https gnupg2 --yes
+            curl https://baltocdn.com/helm/signing.asc | apt-key add -
             echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
             apt-get update
             apt-get install -y helm
