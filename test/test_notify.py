@@ -1,7 +1,6 @@
 import json
 import os
 
-# from api.resources.libs.aws_email import awsContactEmail, OrderConfirmation
 from api.libs.notify import EventRequest, OrderConfirmation
 
 

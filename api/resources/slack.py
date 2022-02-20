@@ -9,8 +9,8 @@ from api.libs.logging import init_logger
 from api.libs.slack import slack_message
 
 AUTH = HTTPBasicAuth()
-LOG = init_logger(os.environ.get('LOG_LEVEL'))
-URL = os.environ.get('SLACK_WEBHOOK_URL')
+LOG = init_logger(os.environ.get("LOG_LEVEL"))
+URL = os.environ.get("SLACK_WEBHOOK_URL")
 
 
 class SlackAPIException(Exception):
@@ -29,13 +29,12 @@ def verify_password(username, password):
 
 
 class SlackAPI(Resource):
-
     @AUTH.login_required
     def post(self):
         body = request.get_json()
-        LOG.info('SlackAPI | Body: %s', body)
-        channel = body['channel']
-        message = add_creation_date(body['message'])
+        LOG.info("SlackAPI | Body: %s", body)
+        channel = body["channel"]
+        message = add_creation_date(body["message"])
         response = slack_message(channel, message, URL)
         if response == 200:
             resp = {"status": 200, "response": "ok", "mimetype": "application/json"}

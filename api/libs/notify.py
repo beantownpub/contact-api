@@ -8,21 +8,22 @@ from api.libs.templates import confirmation_email, event_request_html, event_req
 from api.libs.slack import slack_message
 from api.libs.utils import add_creation_date
 
-DEFAULT_WEBHOOK = os.environ.get('SLACK_WEBHOOK_URL')
-LOG = init_logger(os.environ.get('LOG_LEVEL'))
+DEFAULT_WEBHOOK = os.environ.get("SLACK_WEBHOOK_URL")
+LOG = init_logger(os.environ.get("LOG_LEVEL"))
+
 
 class OrderConfirmationException(Exception):
     """Base class for order confirmation exceptions"""
 
 
 class OrderConfirmation:
-    """Class for sending a confirmation email for a merch order
-    """
-    slack_channel = os.environ.get('SLACK_ORDERS_CHANNEL')
-    slack_webhook_url = os.environ.get('SLACK_ORDERS_WEBHOOK_URL', DEFAULT_WEBHOOK)
-    support_email = os.environ.get('SUPPORT_EMAIL_ADDRESS')
-    support_phone = os.environ.get('SUPPORT_PHONE_NUMBER')
-    shipping_price = os.environ.get('SHIPPING_PRICE', 6.99)
+    """Class for sending a confirmation email for a merch order"""
+
+    slack_channel = os.environ.get("SLACK_ORDERS_CHANNEL")
+    slack_webhook_url = os.environ.get("SLACK_ORDERS_WEBHOOK_URL", DEFAULT_WEBHOOK)
+    support_email = os.environ.get("SUPPORT_EMAIL_ADDRESS")
+    support_phone = os.environ.get("SUPPORT_PHONE_NUMBER")
+    shipping_price = os.environ.get("SHIPPING_PRICE", 6.99)
     subject = "Beantown Pub Merch Order Confirmation"
     sender = "Beantown Merch <orders@beantownpub.com>"
 
@@ -39,10 +40,14 @@ class OrderConfirmation:
             raise OrderConfirmationException("No items in this order %s", self.order_id)
         item_html = []
         for item in self.order_items:
-            if item.get('size'):
-                item_html.append(f"<tr><td>{item['name']}</td><td>{item['size']}</td><td>{item['quantity']}</td><td>{item['price']}</td><td>{item['total']}</td></tr>")
+            if item.get("size"):
+                item_html.append(
+                    f"<tr><td>{item['name']}</td><td>{item['size']}</td><td>{item['quantity']}</td><td>{item['price']}</td><td>{item['total']}</td></tr>"
+                )
             else:
-                item_html.append(f"<tr><td>{item['name']}</td><td></td><td>{item['quantity']}</td><td>{item['price']}</td><td>{item['total']}</td></tr>")
+                item_html.append(
+                    f"<tr><td>{item['name']}</td><td></td><td>{item['quantity']}</td><td>{item['price']}</td><td>{item['total']}</td></tr>"
+                )
         return "\n".join(item_html)
 
     def _shipping_address(self):
@@ -56,7 +61,9 @@ class OrderConfirmation:
         {} <br />
         {}, {}, {}
         </p>
-        """.format(street, unit, city, state, zip)
+        """.format(
+            street, unit, city, state, zip
+        )
         return address
 
     def _build_body(self):
@@ -68,7 +75,7 @@ class OrderConfirmation:
             self.order_total,
             self._shipping_address(),
             self.support_email,
-            self.support_phone
+            self.support_phone,
         )
         return body
 
@@ -80,7 +87,7 @@ class OrderConfirmation:
             f"Order total: {self.order_total}",
             "Questions?",
             f"Email: {self.support_email}",
-            f"Call: {self.support_phone}"
+            f"Call: {self.support_phone}",
         ]
         return "\n".join(body_text)
 
@@ -91,31 +98,32 @@ class OrderConfirmation:
             self._build_body(),
             self._build_raw_text(),
             self.subject,
-            self.sender
+            self.sender,
         )
 
     def send_slack(self):
         """Send message to Slack"""
-        response = slack_message(self.slack_channel, self.order_info, self.slack_webhook_url)
+        response = slack_message(
+            self.slack_channel, self.order_info, self.slack_webhook_url
+        )
         return response
 
 
 class EventRequest:
-    """Class for sending an email for a private event request
-    """
+    """Class for sending an email for a private event request"""
 
     sender = "Beantown Event <contact@beantownpub.com>"
-    slack_channel = os.environ.get('SLACK_PARTYS_CHANNEL')
-    slack_webhook_url = os.environ.get('SLACK_PARTYS_WEBHOOK_URL', DEFAULT_WEBHOOK)
+    slack_channel = os.environ.get("SLACK_PARTYS_CHANNEL")
+    slack_webhook_url = os.environ.get("SLACK_PARTYS_WEBHOOK_URL", DEFAULT_WEBHOOK)
 
     def __init__(self, contact_info, recipient):
         self.contact_info = add_creation_date(contact_info)
-        self.location = contact_info['location']
-        self.name = contact_info['name']
-        self.phone_number = contact_info['phone']
-        self.email = contact_info['email']
-        self.details = contact_info['details']
-        self.catering = contact_info['catering']
+        self.location = contact_info["location"]
+        self.name = contact_info["name"]
+        self.phone_number = contact_info["phone"]
+        self.email = contact_info["email"]
+        self.details = contact_info["details"]
+        self.catering = contact_info["catering"]
         self.recipient = recipient
 
     def _build_subject(self):
@@ -129,7 +137,7 @@ class EventRequest:
             self._format_phone_number(),
             self.email,
             self.details,
-            self.catering
+            self.catering,
         )
         return body
 
@@ -147,22 +155,24 @@ class EventRequest:
             self._format_phone_number(),
             self.email,
             self.details,
-            self.catering
+            self.catering,
         )
         return raw_text
 
     def send_email(self):
-        LOG.info('Sending AWS Email from %s', self.sender)
+        LOG.info("Sending AWS Email from %s", self.sender)
         send_message(
             self.recipient,
             self._build_body(),
             self._build_raw_text(),
             self._build_subject(),
-            self.sender
+            self.sender,
         )
 
     def send_slack(self):
         """Send message to Slack"""
-        LOG.info('Sending Slack message | %s', self.contact_info)
-        response = slack_message(self.slack_channel, self.contact_info, self.slack_webhook_url)
+        LOG.info("Sending Slack message | %s", self.contact_info)
+        response = slack_message(
+            self.slack_channel, self.contact_info, self.slack_webhook_url
+        )
         return response

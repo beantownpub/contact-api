@@ -1,4 +1,3 @@
-
 confirmation_email = """<html>
     <head></head>
     <style>
