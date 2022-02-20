@@ -6,18 +6,34 @@ executors:
     environment:
       DOCKER_BUILDKIT: 1
       BUILDX_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6
+    test:
+      image: python:3.7-slim-buster
 
 commands:
   install_yq:
-    description: Install yq
+    description: Install yq to get API version from swagger.yaml
     steps:
       - run:
           name: Install yq
           command: |
             sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
             sudo chmod a+x /usr/local/bin/yq
+  install_pytest:
+    description: Install pytest for running tests
+    steps:
+      - run:
+          name: Install pytest
+          command: pip install pytest
 
 jobs:
+  run_tests:
+    executor: test
+    steps:
+      - checkout
+      - install_pytest
+      - run:
+          name: Run tests
+          command: make test
   build_and_publish:
     executor: build_machine
     steps:
@@ -39,12 +55,13 @@ jobs:
           command: |
             export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
             echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
-            docker tag contact_api:$CONTACT_API_VERSION jalgraves/contact_api:$CONTACT_API_VERSION
-            docker push jalgraves/contact_api:$CONTACT_API_VERSION
+            docker tag contact_api:$CONTACT_API_VERSION $DOCKER_USERNAME/contact_api:$CONTACT_API_VERSION
+            docker push $DOCKER_USERNAME/contact_api:$CONTACT_API_VERSION
 
 
 workflows:
   version: 2
   build_and_publish:
     jobs:
+      - run_tests
       - build_and_publish
