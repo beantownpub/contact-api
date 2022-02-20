@@ -7,16 +7,25 @@ executors:
       DOCKER_BUILDKIT: 1
       BUILDX_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6
 
+commands:
+  install_yq:
+    description: Install YQ
+    steps:
+      - run:
+          name: Install YQ
+          command: |
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod a+x /usr/local/bin/yq
+
 jobs:
   build:
     executor: build_machine
     steps:
       - checkout
+      - install_yq
       - run:
           name: Build Docker image
           command: |
-            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-            sudo chmod a+x /usr/local/bin/yq
             export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
             docker build -t contact_api:$CONTACT_API_VERSION .
       - persist_to_workspace:
@@ -28,6 +37,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - install_yq
       - run:
           name: Demonstrate that Mongo DB is available as localhost
           command: |
