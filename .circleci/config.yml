@@ -42,10 +42,10 @@ commands:
           name: Install helm
           command: |
             curl https://baltocdn.com/helm/signing.asc | apt-key add -
-            apt-get install apt-transport-https --yes
-            "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+            apt-get install apt-transport-https gnupg2 --yes
+            echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
             apt-get update
-            apt-get install helm
+            apt-get install -y helm
 
 jobs:
   run_tests:
@@ -88,11 +88,33 @@ jobs:
       - checkout
       - install_k8s_dependencies
       - run:
-          name: Helm deploy
+          name: Add Helm repo
           command: |
-            helm repo add https://beantownpub.github.io/helm/
+            helm repo add beantown $HELM_REPO
             kubectl config get-contexts
             kubectl get pods -n prod
+      - run:
+          name: Deploy contact-api
+          command: |
+            helm template beantown/contact-api \
+              --namespace prod \
+              --set global.env=prod \
+              --set logLevel=$LOG_LEVEL \
+              --set aws_access_key_id="${AWS_ACCESS_KEY_ID}" \
+              --set aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}" \
+              --set aws_default_region="${AWS_DEFAULT_REGION}" \
+              --set email_recipient="${EMAIL_RECIPIENT}" \
+              --set second_email_recipient="${SECOND_EMAIL_RECIPIENT}" \
+              --set slack_channel="${SLACK_WEBHOOK_CHANNEL}" \
+              --set slack_user="${SLACK_USER}" \
+              --set slack_webhook_url="${SLACK_WEBHOOK_URL}" \
+              --set support_email_address="${SUPPORT_EMAIL_ADDRESS}" \
+              --set support_phone_number="${SUPPORT_PHONE_NUMBER}" \
+              --set slack_partys_channel="${SLACK_PARTYS_CHANNEL}" \
+              --set slack_orders_channel="${SLACK_ORDERS_CHANNEL}" \
+              --set slack_orders_webhook_url=${SLACK_ORDERS_WEBHOOK_URL} \
+              --set slack_partys_webhook_url=${SLACK_PARTYS_WEBHOOK_URL} \
+              --debug
 
 
 workflows:
