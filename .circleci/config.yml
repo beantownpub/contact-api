@@ -35,7 +35,7 @@ jobs:
       - run:
           name: Publish Image
           command: |
-            env | grep 'CONTACT'
+            export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
             echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
             docker tag contact_api:$CONTACT_API_VERSION jalgraves/contact_api:$CONTACT_API_VERSION
             docker push jalgraves/contact_api:$CONTACT_API_VERSION
