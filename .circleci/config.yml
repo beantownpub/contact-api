@@ -6,8 +6,9 @@ executors:
     environment:
       DOCKER_BUILDKIT: 1
       BUILDX_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6
-    test:
-      image: python:3.7-slim-buster
+  test:
+    docker:
+    - image: python:3.7-slim-buster
 
 commands:
   install_yq:
