@@ -6,7 +6,7 @@ executors:
     environment:
       DOCKER_BUILDKIT: 1
       BUILDX_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6
-  test:
+  debian:
     docker:
     - image: python:3.7-slim-buster
 
@@ -25,10 +25,31 @@ commands:
       - run:
           name: Install dependencies
           command: pip install -r requirements.txt
+  install_k8s_dependencies:
+    description: Install dependencies for deploying to K8s cluster
+    steps:
+      - run:
+          name: Install kubectl
+          command: |
+            apt-get update -y && apt-get install -y curl
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl config set-credentials jalbot --token=$JALBOT_TOKEN
+            kubectl config set-cluster prod --server=$K8S_SERVER --insecure-skip-tls-verify=true
+            kubectl config set-context jalbot --cluster=prod --user=jalbot
+            kubectl config use-context jalbot
+      - run:
+          name: Install helm
+          command: |
+            curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+            apt-get install apt-transport-https --yes
+            "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+            apt-get update
+            apt-get install helm
 
 jobs:
   run_tests:
-    executor: test
+    executor: debian
     steps:
       - checkout
       - install_pytest
@@ -60,12 +81,28 @@ jobs:
             docker tag contact_api:$CONTACT_API_VERSION $DOCKER_USERNAME/contact_api:$CONTACT_API_VERSION
             docker push $DOCKER_USERNAME/contact_api:$CONTACT_API_VERSION
 
+  deploy:
+    circleci_ip_ranges: true
+    executor: debian
+    steps:
+      - checkout
+      - install_k8s_dependencies
+      - run:
+          name: Helm deploy
+          command: |
+            helm repo add https://beantownpub.github.io/helm/
+            kubectl config get-contexts
+            kubectl get pods -n prod
+
 
 workflows:
   version: 2
-  build_and_publish:
+  contact_api:
     jobs:
       - run_tests
       - build_and_publish:
           requires:
             - run_tests
+      - deploy:
+          requires:
+            - build_and_publish
