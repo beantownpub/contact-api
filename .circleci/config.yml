@@ -34,7 +34,8 @@ jobs:
       - install_pytest
       - run:
           name: Run tests
-          command: make test
+          command: python -m pytest test/
+
   build_and_publish:
     executor: build_machine
     steps:
