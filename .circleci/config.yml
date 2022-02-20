@@ -9,56 +9,40 @@ executors:
 
 commands:
   install_yq:
-    description: Install YQ
+    description: Install yq
     steps:
       - run:
-          name: Install YQ
+          name: Install yq
           command: |
             sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
             sudo chmod a+x /usr/local/bin/yq
 
 jobs:
-  build:
+  build_and_publish:
     executor: build_machine
     steps:
       - checkout
       - install_yq
       - run:
-          name: Build Docker image
+          name: Build Image
           command: |
             export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
             docker build -t contact_api:$CONTACT_API_VERSION .
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  publish:
-    executor: build_machine
-    steps:
-      - attach_workspace:
-          at: .
-      - install_yq
+      - run: |
+          if [ "$CIRCLE_BRANCH" != "master" ]; then
+              circleci-agent step halt
+          fi
       - run:
-          name: Demonstrate that Mongo DB is available as localhost
+          name: Publish Image
           command: |
-            ls -al
-            export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
+            env | grep 'CONTACT'
             echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
             docker tag contact_api:$CONTACT_API_VERSION jalgraves/contact_api:$CONTACT_API_VERSION
             docker push jalgraves/contact_api:$CONTACT_API_VERSION
+
 
 workflows:
   version: 2
   build_and_publish:
     jobs:
-      - build
-      - publish:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
-
-
-
+      - build_and_publish
