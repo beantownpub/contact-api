@@ -20,7 +20,7 @@ CONFIRMATION_EMAIL = OrderConfirmation(
 
 def test_email_info():
     assert EVENT_REQUEST.sender == "Beantown Event <contact@beantownpub.com>"
-    assert RECIPIENT.find("@gmail") != -1
+    assert RECIPIENT.find("@yahoo") != -1
     assert EVENT_REQUEST._format_phone_number() == "555-666-1234"
     assert CONFIRMATION_EMAIL.recipient.find("@") != -1
 
