@@ -97,7 +97,7 @@ jobs:
           name: Deploy contact-api
           command: |
             helm repo update
-            helm template beantown/contact-api \
+            helm upgrade --install contact-api beantown/contact-api \
               --namespace prod \
               --set global.env=prod \
               --set logLevel=$LOG_LEVEL \
