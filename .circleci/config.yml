@@ -92,6 +92,7 @@ jobs:
     executor: debian
     steps:
       - checkout
+      - install_yq
       - check_tags
       - install_k8s_dependencies
       - run:
