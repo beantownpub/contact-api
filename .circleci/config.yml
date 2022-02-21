@@ -46,6 +46,17 @@ commands:
             echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
             apt-get update
             apt-get install -y helm
+  check_tags:
+    description: Check if git tag matches swagger.yaml version
+    steps:
+      - run:
+          name: Check tags
+          command: |
+            CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
+            GIT_TAG=$(git describe)
+            if [ "$CONTACT_API_VERSION" != "$GIT_TAG" ]; then
+                circleci-agent step halt
+            fi
 
 jobs:
   run_tests:
@@ -67,12 +78,7 @@ jobs:
           command: |
             export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
             docker build -t contact_api:$CONTACT_API_VERSION .
-      - run:
-          name: Check Branch
-          command: |
-            if [ "$CIRCLE_BRANCH" != "master" ]; then
-                circleci-agent step halt
-            fi
+      - check_tags
       - run:
           name: Publish Image
           command: |
@@ -86,6 +92,7 @@ jobs:
     executor: debian
     steps:
       - checkout
+      - check_tags
       - install_k8s_dependencies
       - run:
           name: Add Helm repo
@@ -93,6 +100,14 @@ jobs:
             helm repo add beantown $HELM_REPO
             kubectl config get-contexts
             kubectl get pods -n prod
+      - run:
+          name: Check tag
+          command: |
+            CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
+            GIT_TAG=$(git describe --abbrev=0)
+            if [ "$CONTACT_API_VERSION" != "$GIT_TAG" ]; then
+                circleci-agent step halt
+            fi
       - run:
           name: Deploy contact-api
           command: |
@@ -130,8 +145,3 @@ workflows:
       - deploy:
           requires:
             - build_and_publish
-          filters:
-            tags:
-              only: /^\d\.\d\.\d\w{0,5}$/
-            branches:
-              ignore: /.*/
