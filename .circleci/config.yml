@@ -130,3 +130,7 @@ workflows:
       - deploy:
           requires:
             - build_and_publish
+          filters:
+            tags:
+              only:
+                - ^v\d\.\d\.\d\w{0,5}$
