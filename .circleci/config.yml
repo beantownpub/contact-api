@@ -101,20 +101,14 @@ jobs:
             kubectl config get-contexts
             kubectl get pods -n prod
       - run:
-          name: Check tag
-          command: |
-            CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
-            GIT_TAG=$(git describe --abbrev=0)
-            if [ "$CONTACT_API_VERSION" != "$GIT_TAG" ]; then
-                circleci-agent step halt
-            fi
-      - run:
           name: Deploy contact-api
           command: |
+            export CONTACT_API_VERSION=$(yq eval '.info.version' swagger.yaml)
             helm repo update
             helm upgrade --install contact-api beantown/contact-api \
               --namespace prod \
               --set global.env=prod \
+              --set image.tag=$CONTACT_API_VERSION \
               --set logLevel=$LOG_LEVEL \
               --set aws_access_key_id="${AWS_ACCESS_KEY_ID}" \
               --set aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}" \
