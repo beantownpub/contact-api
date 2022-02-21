@@ -103,8 +103,12 @@ class OrderConfirmation:
 
     def send_slack(self):
         """Send message to Slack"""
+        if self.order_info["order"]["lastName"] == "Ordertester-123":
+            slack_url = DEFAULT_WEBHOOK
+        else:
+            slack_url = self.slack_webhook_url
         response = slack_message(
-            self.slack_channel, self.order_info, self.slack_webhook_url
+            self.slack_channel, self.order_info, slack_url
         )
         return response
 
@@ -172,7 +176,11 @@ class EventRequest:
     def send_slack(self):
         """Send message to Slack"""
         LOG.info("Sending Slack message | %s", self.contact_info)
+        if self.contact_info["name"] == "Partytester-123":
+            slack_url = DEFAULT_WEBHOOK
+        else:
+            slack_url = self.slack_webhook_url
         response = slack_message(
-            self.slack_channel, self.contact_info, self.slack_webhook_url
+            self.slack_channel, self.contact_info, slack_url
         )
         return response

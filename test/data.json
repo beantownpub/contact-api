@@ -1,6 +1,6 @@
 {
     "message_info": {
-        "name": "Jonny Test",
+        "name": "Partytester-123",
         "phone": "5556661234",
         "email": "jtest@fake.com",
         "event_date": "Not provided",
@@ -10,7 +10,7 @@
     },
     "order_info": {
         "firstName": "Jonny",
-        "lastName": "Graves",
+        "lastName": "Ordertester-123",
         "street": "4 North Fake Court",
         "unit": "Apt. 69",
         "city": "Boston",
