@@ -132,6 +132,6 @@ workflows:
             - build_and_publish
           filters:
             tags:
-              only: ^\d\.\d\.\d\w{0,5}$
+              only: /^\d\.\d\.\d\w{0,5}$/
             branches:
               ignore: /.*/
