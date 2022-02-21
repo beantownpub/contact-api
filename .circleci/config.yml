@@ -17,8 +17,11 @@ commands:
       - run:
           name: Install yq
           command: |
-            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-            sudo chmod a+x /usr/local/bin/yq
+            if [ "$CIRCLE_JOB" = "deploy" ]; then
+              apt-get update -y && apt-get install -y wget
+            fi
+            wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            chmod a+x /usr/local/bin/yq
   install_pytest:
     description: Install pytest for running tests
     steps:
