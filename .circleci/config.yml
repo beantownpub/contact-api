@@ -19,9 +19,12 @@ commands:
           command: |
             if [ "$CIRCLE_JOB" = "deploy" ]; then
               apt-get update -y && apt-get install -y wget
+              wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+              chmod a+x /usr/local/bin/yq
+            else
+              sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+              sudo chmod a+x /usr/local/bin/yq
             fi
-            wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-            chmod a+x /usr/local/bin/yq
   install_pytest:
     description: Install pytest for running tests
     steps:
