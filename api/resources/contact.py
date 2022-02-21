@@ -33,10 +33,11 @@ class EventContactAPI(Resource):
         "If error persists email request to beantownpubboston@gmail.com",
     ]
     recipient = os.environ.get("EMAIL_RECIPIENT")
+    test_recipient = os.environ.get("TEST_EMAIL_RECIPIENT")
 
     @AUTH.login_required
     def get(self, location):
-        version = {"app": "contact_api", "version": "0.1.7", "location": location}
+        version = {"app": "contact_api", "version": "0.1.11", "location": location}
         LOG.info("- ContactAPI | Version: %s", version)
         return Response(json.dumps(version), mimetype="application/json", status=200)
 
@@ -45,7 +46,12 @@ class EventContactAPI(Resource):
         body = request.get_json()
         body["location"] = location
         LOG.info("Body: %s", body)
-        message = EventRequest(body, self.recipient)
+        if body["name"] == "Jonny Graves Test":
+            email_recipient = self.test_recipient
+            LOG.info("Sending email to test account %s", self.test_recipient)
+        else:
+            email_recipient = self.recipient
+        message = EventRequest(body, email_recipient)
         slack_status = message.send_slack()
         message.send_email()
         if slack_status == 200:
