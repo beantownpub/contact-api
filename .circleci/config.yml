@@ -40,9 +40,9 @@ commands:
       - run:
           name: Install kubectl
           command: |
-            apt-get update -y && apt-get install -y curl
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            sudo apt-get update -y && sudo apt-get install -y curl
+            sudo curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
             kubectl config set-credentials jalbot --token=$JALBOT_TOKEN
             kubectl config set-cluster prod --server=$K8S_SERVER --insecure-skip-tls-verify=true
             kubectl config set-context jalbot --cluster=prod --user=jalbot
@@ -50,11 +50,11 @@ commands:
       - run:
           name: Install helm
           command: |
-            apt-get install apt-transport-https gnupg2 --yes
-            curl https://baltocdn.com/helm/signing.asc | apt-key add -
-            echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
-            apt-get update
-            apt-get install -y helm
+            sudo apt-get install apt-transport-https gnupg2 --yes
+            sudo curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+            sudo echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+            sudo apt-get update
+            sudo apt-get install -y helm
   check_tags:
     description: Check if git tag matches swagger.yaml version
     steps:
