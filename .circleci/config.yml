@@ -97,7 +97,6 @@ jobs:
             docker push $DOCKER_USERNAME/contact_api:$CONTACT_API_VERSION
 
   deploy:
-    circleci_ip_ranges: true
     executor: debian
     steps:
       - checkout
@@ -140,7 +139,7 @@ jobs:
 
 workflows:
   version: 2
-  contact_api:
+  on-commit:
     jobs:
       - run_tests
       - build_and_publish:
