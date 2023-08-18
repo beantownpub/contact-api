@@ -1,0 +1,6 @@
+dependencies:
+- name: postgres
+  repository: https://beantownpub.github.io/helm/
+  version: 0.1.4
+digest: sha256:cd121bd6665a9b64c2d47371383e27ce784bf8e73dbc49c0170d072120f47696
+generated: "2023-07-19T16:29:26.804258-04:00"

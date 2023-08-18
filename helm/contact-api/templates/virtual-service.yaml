@@ -6,7 +6,7 @@ metadata:
 spec:
   hosts:
   - "{{ include "contact-api.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
-  - "{{ include "contact-api.fullname" . }}.{{ .Release.Namespace }}.beantownpub.com"
+  - "{{ include "contact-api.fullname" . }}.{{ .Value.regionCode }}.{{ .Release.Namespace }}.aws.beantownpub.com"
 
   gateways:
   - istio-ingress/web-gateway

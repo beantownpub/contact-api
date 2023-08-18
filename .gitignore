@@ -134,3 +134,4 @@ dmypy.json
 .vscode
 tmp.py
 helm/contact_api/*.tgz
+helm/charts/*.tgz
