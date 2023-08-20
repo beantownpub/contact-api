@@ -14,8 +14,8 @@ ingress:
 
 db:
   dbName: contact
-  host: postgres.default.svc.cluster.local
-  port: 5432
+  host:
+  port:
 
 logLevel: INFO
 database:
