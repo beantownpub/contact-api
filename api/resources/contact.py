@@ -6,10 +6,11 @@ from flask_httpauth import HTTPBasicAuth
 from flask_restful import Resource
 from api.libs.notify import EventRequest, OrderConfirmation
 from api.libs.logging import init_logger
+from api.libs.aws import get_secret
 
 AUTH = HTTPBasicAuth()
 LOG = init_logger(os.environ.get("LOG_LEVEL"))
-
+SECRET = get_secret()
 
 class OrderConfirmationException(Exception):
     """Base  class for order confirmation exceptions"""
@@ -32,12 +33,12 @@ class EventContactAPI(Resource):
         "Error Sending Request. Please try again.",
         "If error persists email request to beantownpubboston@gmail.com",
     ]
-    recipient = os.environ.get("EMAIL_RECIPIENT")
-    test_recipient = os.environ.get("TEST_EMAIL_RECIPIENT")
+    recipient = SECRET["email_recipient"]
+    test_recipient = SECRET["test_email_recipient"]
 
     @AUTH.login_required
     def get(self, location):
-        version = {"app": "contact_api", "version": "0.1.11", "location": location}
+        version = {"app": "contact_api", "version": "0.1.14", "location": location}
         LOG.info("- ContactAPI | Version: %s", version)
         return Response(json.dumps(version), mimetype="application/json", status=200)
 
@@ -103,3 +104,13 @@ class MerchContactAPI(Resource):
         order = request.get_json()
         LOG.info("- ContactAPI | OPTIONS | %s", order)
         return "", 200
+
+
+class AwsTestAPI(Resource):
+
+    def get(self):
+        secret = get_secret()
+        LOG.info('Secret: %s', secret)
+        data = {"app": "contact_api", "version": "0.1.14", "secret": secret}
+        LOG.info("- ContactAPI | Data: %s", data)
+        return Response(json.dumps(data), mimetype="application/json", status=200)

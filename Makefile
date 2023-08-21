@@ -37,7 +37,7 @@ compile:
 
 build:
 	@echo "\033[1;32m. . . Building Contact API image . . .\033[1;37m\n"
-	docker build -t $(image):$(image_tag) .
+	docker build --platform linux/x86_64 -t $(image):$(image_tag) .
 
 publish: build
 	docker tag $(image):$(image_tag) $(repo)/$(image):$(image_tag)

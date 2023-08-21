@@ -6,10 +6,12 @@ from flask_restful import Resource
 from api.libs.utils import add_creation_date
 from api.libs.logging import init_logger
 from api.libs.slack import slack_message
+from api.libs.aws import get_secret
 
+SECRET = get_secret()
 AUTH = HTTPBasicAuth()
 LOG = init_logger(os.environ.get("LOG_LEVEL").strip())
-URL = os.environ.get("SLACK_WEBHOOK_URL").strip()
+URL = SECRET["slack_webhook_url"]
 
 
 class SlackAPIException(Exception):

@@ -24,72 +24,20 @@ spec:
     spec:
       containers:
       - env:
-        - name: EMAIL_RECIPIENT
-          valueFrom:
-            secretKeyRef:
-              key: email_recipient
-              name: contact-api-creds
-              optional: false
-        - name: SECOND_EMAIL_RECIPIENT
-          valueFrom:
-            secretKeyRef:
-              key: second_email_recipient
-              name: contact-api-creds
-              optional: false
-        - name: TEST_EMAIL_RECIPIENT
-          valueFrom:
-            secretKeyRef:
-              key: test_email_recipient
-              name: contact-api-creds
-              optional: false
-        - name: SLACK_WEBHOOK_USER
-          valueFrom:
-            secretKeyRef:
-              key: slack_user
-              name: contact-api-creds
-        - name: SLACK_WEBHOOK_CHANNEL
-          valueFrom:
-            secretKeyRef:
-              key: slack_channel
-              name: contact-api-creds
-        - name: SLACK_WEBHOOK_URL
-          valueFrom:
-            secretKeyRef:
-              key: slack_webhook_url
-              name: contact-api-creds
-              optional: false
-        - name: SLACK_ORDERS_WEBHOOK_URL
-          valueFrom:
-            secretKeyRef:
-              key: slack_orders_webhook_url
-              name: contact-api-creds
-              optional: false
-        - name: SLACK_ORDERS_CHANNEL
-          valueFrom:
-            secretKeyRef:
-              key: slack_orders_channel
-              name: contact-api-creds
-        - name: SLACK_PARTYS_WEBHOOK_URL
-          valueFrom:
-            secretKeyRef:
-              key: slack_partys_webhook_url
-              name: contact-api-creds
-              optional: false
-        - name: SLACK_PARTYS_CHANNEL
-          valueFrom:
-            secretKeyRef:
-              key: slack_partys_channel
-              name: contact-api-creds
+        # - name: API_USERNAME
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: api_user
+        #       name: app-creds
+        # - name: API_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: api_pass
+        #       name: app-creds
         - name: API_USERNAME
-          valueFrom:
-            secretKeyRef:
-              key: api_user
-              name: app-creds
+          value: wtf
         - name: API_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: api_pass
-              name: app-creds
+          value: wtf
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
@@ -108,16 +56,10 @@ spec:
               key: aws_default_region
               name: contact-api-creds
               optional: false
-        - name: SUPPORT_EMAIL_ADDRESS
+        - name: AWS_SECRET_NAME
           valueFrom:
             secretKeyRef:
-              key: support_email_address
-              name: contact-api-creds
-              optional: false
-        - name: SUPPORT_PHONE_NUMBER
-          valueFrom:
-            secretKeyRef:
-              key: support_phone_number
+              key: aws_secret_name
               name: contact-api-creds
               optional: false
         - name: LOG_LEVEL

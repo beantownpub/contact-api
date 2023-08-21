@@ -43,8 +43,9 @@ helm/install: helm/context
 		--namespace $(namespace) \
 		--set global.env=$(env) \
 		--set logLevel=$(log_level) \
-		--set aws_access_key_id="${AWS_ACCESS_KEY_ID}" \
-		--set aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}" \
+		--set aws_access_key_id="${CONTACT_API_AWS_ACCESS_KEY_ID}" \
+		--set aws_secret_access_key="${CONTACT_API_AWS_SECRET_ACCESS_KEY}" \
+		--set aws_secret_name="${AWS_SECRET_NAME}" \
 		--set aws_default_region="${AWS_DEFAULT_REGION}" \
 		--set email_recipient="$(email_recipient)" \
 		--set second_email_recipient="${SECOND_EMAIL_RECIPIENT}" \
@@ -80,8 +81,8 @@ helm/deploy/db: helm/context
 		--namespace $(namespace) \
 		--set global.env=$(env) \
 		--set logLevel=$(log_level) \
-		--set aws_access_key_id="${AWS_ACCESS_KEY_ID}" \
-		--set aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}" \
+		--set aws_access_key_id="${CONTACT_API_AWS_ACCESS_KEY_ID}" \
+		--set aws_secret_access_key="${CONTACT_API_AWS_SECRET_ACCESS_KEY}" \
 		--set aws_default_region="${AWS_DEFAULT_REGION}" \
 		--set email_recipient="$(email_recipient)" \
 		--set second_email_recipient="${SECOND_EMAIL_RECIPIENT}" \
@@ -140,4 +141,4 @@ helm/template:
 		--debug
 
 helm/port_forward: helm/context
-		kubectl port-forward --namespace $(namespace) svc/$(name) $(port):$(port)
+		kubectl port-forward --namespace $(namespace) svc/contact-api $(port):$(port)

@@ -2,15 +2,16 @@ import os
 
 from datetime import datetime
 
-from api.libs.aws import send_message
+from api.libs.aws import get_secret, send_message
 from api.libs.logging import init_logger
 from api.libs.templates import confirmation_email, event_request_html, event_request_raw
 from api.libs.slack import slack_message
 from api.libs.utils import add_creation_date
 
-DEFAULT_WEBHOOK = os.environ.get("SLACK_WEBHOOK_URL").strip()
-LOG = init_logger(os.environ.get("LOG_LEVEL").strip())
 
+LOG = init_logger(os.environ.get("LOG_LEVEL").strip())
+SECRET = get_secret()
+DEFAULT_WEBHOOK = SECRET["slack_webhook_url"]
 
 class OrderConfirmationException(Exception):
     """Base class for order confirmation exceptions"""
@@ -19,11 +20,12 @@ class OrderConfirmationException(Exception):
 class OrderConfirmation:
     """Class for sending a confirmation email for a merch order"""
 
-    slack_channel = os.environ.get("SLACK_ORDERS_CHANNEL").strip()
-    slack_webhook_url = os.environ.get("SLACK_ORDERS_WEBHOOK_URL", DEFAULT_WEBHOOK).strip()
-    support_email = os.environ.get("SUPPORT_EMAIL_ADDRESS").strip()
-    support_phone = os.environ.get("SUPPORT_PHONE_NUMBER").strip()
-    shipping_price = os.environ.get("SHIPPING_PRICE", 6.99).strip()
+
+    slack_channel = SECRET["slack_orders_channel"]
+    slack_webhook_url = SECRET["slack_orders_webhook_url"]
+    support_email = SECRET["support_email_address"]
+    support_phone = SECRET["support_phone_number"]
+    shipping_price = 6.99
     subject = "Beantown Pub Merch Order Confirmation"
     sender = "Beantown Merch <orders@beantownpub.com>"
 
@@ -117,8 +119,8 @@ class EventRequest:
     """Class for sending an email for a private event request"""
 
     sender = "Beantown Event <contact@beantownpub.com>"
-    slack_channel = os.environ.get("SLACK_PARTYS_CHANNEL")
-    slack_webhook_url = os.environ.get("SLACK_PARTYS_WEBHOOK_URL", DEFAULT_WEBHOOK)
+    slack_channel = SECRET["slack_partys_channel"]
+    slack_webhook_url = SECRET["slack_partys_webhook_url"]
 
     def __init__(self, contact_info, recipient):
         self.contact_info = add_creation_date(contact_info)
