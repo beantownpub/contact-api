@@ -1,6 +1,6 @@
 FROM python:3.7-slim-buster
 
-ENV TINI_VERSION v0.18.0
+ENV TINI_VERSION v0.19.0
 
 RUN apt-get update -y && pip install -U pip
 COPY ./requirements.txt .
