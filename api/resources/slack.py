@@ -1,4 +1,3 @@
-import json
 import os
 
 from flask import Response, request
@@ -9,8 +8,8 @@ from api.libs.logging import init_logger
 from api.libs.slack import slack_message
 
 AUTH = HTTPBasicAuth()
-LOG = init_logger(os.environ.get("LOG_LEVEL"))
-URL = os.environ.get("SLACK_WEBHOOK_URL")
+LOG = init_logger(os.environ.get("LOG_LEVEL").strip())
+URL = os.environ.get("SLACK_WEBHOOK_URL").strip()
 
 
 class SlackAPIException(Exception):
@@ -19,8 +18,8 @@ class SlackAPIException(Exception):
 
 @AUTH.verify_password
 def verify_password(username, password):
-    api_username = os.environ.get("API_USERNAME")
-    api_password = os.environ.get("API_PASSWORD")
+    api_username = os.environ.get("API_USERNAME").strip()
+    api_password = os.environ.get("API_PASSWORD").strip()
     if username.strip() == api_username and password.strip() == api_password:
         verified = True
     else:

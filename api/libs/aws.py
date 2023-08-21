@@ -4,8 +4,8 @@ from botocore.exceptions import ClientError
 
 from api.libs.logging import init_logger
 
-LOG = init_logger(os.environ.get("LOG_LEVEL"))
-AWS_REGION = os.environ.get("AWS_DEFAULT_REGION")
+LOG = init_logger(os.environ.get("LOG_LEVEL").strip())
+AWS_REGION = os.environ.get("AWS_DEFAULT_REGION").strip()
 CHARSET = "UTF-8"
 
 client = boto3.client("ses", region_name=AWS_REGION)

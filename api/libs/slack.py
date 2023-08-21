@@ -4,11 +4,11 @@ import requests
 
 from .logging import init_logger
 
-URL = os.environ.get("SLACK_WEBHOOK_URL")
+URL = os.environ.get("SLACK_WEBHOOK_URL").strip()
 # CHANNEL = os.environ.get('SLACK_WEBHOOK_CHANNEL')
-USER = os.environ.get("SLACK_WEBHOOK_USER")
+USER = os.environ.get("SLACK_WEBHOOK_USER").strip()
 HEADERS = {"Content-type": "application/json"}
-LOG_LEVEL = os.environ.get("LOG_LEVEL")
+LOG_LEVEL = os.environ.get("LOG_LEVEL").strip()
 LOG = init_logger(LOG_LEVEL)
 
 
