@@ -69,3 +69,4 @@ Create the name of the service account to use
 {{- default "%s:%s" .Values.image.name .Values.image.tag }}
 {{- end }}
 {{- end }}
+

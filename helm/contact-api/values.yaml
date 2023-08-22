@@ -2,6 +2,7 @@ appName: contact-api
 global:
   env: dev
 image:
+  name:
   repository: jalgraves/contact-api
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
@@ -22,6 +23,16 @@ database:
   enabled: false
 
 regionCode: use2
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::112138771825:role/ProductionUse2SecretsManager
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
 
 aws_access_key_id:
 aws_secret_access_key:

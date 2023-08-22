@@ -27,6 +27,17 @@ def verify_password(username, password):
     return verified
 
 
+@AUTH.error_handler
+def unauthorized():
+    LOG.info("Unauthorized request")
+    resp = {
+        "status": 401,
+        "response": "Unauthorized",
+        "mimetype": "application/json",
+    }
+    return Response(**resp)
+
+
 class EventContactAPI(Resource):
     success = "Request Received! We will respond to you as soon as we can. Thanks!"
     failure = [

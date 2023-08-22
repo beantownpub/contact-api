@@ -35,21 +35,21 @@ spec:
         #       key: api_pass
         #       name: app-creds
         - name: API_USERNAME
-          value: wtf
+          value: beanbot
         - name: API_PASSWORD
-          value: wtf
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              key: aws_access_key_id
-              name: contact-api-creds
-              optional: false
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              key: aws_secret_access_key
-              name: contact-api-creds
-              optional: false
+          value: qqDLpPh3iK8cKbyuDLDmrp3V
+        # - name: AWS_ACCESS_KEY_ID
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: aws_access_key_id
+        #       name: contact-api-creds
+        #       optional: false
+        # - name: AWS_SECRET_ACCESS_KEY
+        #   valueFrom:
+        #     secretKeyRef:
+        #       key: aws_secret_access_key
+        #       name: contact-api-creds
+        #       optional: false
         - name: AWS_DEFAULT_REGION
           valueFrom:
             secretKeyRef:
@@ -82,6 +82,9 @@ spec:
           readOnlyRootFilesystem: false
           runAsNonRoot: false
         resources: {}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "contact-api.serviceAccountName" . }}
+      {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
