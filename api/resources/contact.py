@@ -18,8 +18,8 @@ class OrderConfirmationException(Exception):
 
 @AUTH.verify_password
 def verify_password(username, password):
-    api_username = os.environ.get("API_USERNAME").strip()
-    api_password = os.environ.get("API_PASSWORD").strip()
+    api_username = SECRET["api_username"].strip()
+    api_password = SECRET["api_password"].strip()
     if username.strip() == api_username and password.strip() == api_password:
         verified = True
     else:
