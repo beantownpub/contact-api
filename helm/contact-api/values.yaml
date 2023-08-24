@@ -1,5 +1,7 @@
 appName: contact-api
 aws:
+  accessKeyId:
+  secretAccessKey:
   region:
   secretName:
 nameOverride:
@@ -28,6 +30,7 @@ database:
   enabled: false
 
 regionCode: use2
+replicaCount: 1
 resources:
   requests:
     cpu: 50m
@@ -44,19 +47,4 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-aws_access_key_id:
-aws_secret_access_key:
-aws_default_region:
-aws_secret_name:
-email_recipient:
-second_email_recipient:
-slack_channel:
-slack_user:
-slack_webhook_url:
-support_email_address:
-support_phone_number:
-slack_partys_channel:
-slack_orders_channel:
-slack_orders_webhook_url:
-slack_partys_webhook_url:
-test_email_recipient:
+

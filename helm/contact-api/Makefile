@@ -43,22 +43,10 @@ helm/install: helm/context
 		--namespace $(namespace) \
 		--set global.env=$(env) \
 		--set logLevel=$(log_level) \
-		--set aws_access_key_id="${CONTACT_API_AWS_ACCESS_KEY_ID}" \
-		--set aws_secret_access_key="${CONTACT_API_AWS_SECRET_ACCESS_KEY}" \
-		--set aws_secret_name="${AWS_SECRET_NAME}" \
-		--set aws_default_region="${AWS_DEFAULT_REGION}" \
-		--set email_recipient="$(email_recipient)" \
-		--set second_email_recipient="${SECOND_EMAIL_RECIPIENT}" \
-		--set slack_channel="${SLACK_WEBHOOK_CHANNEL}" \
-		--set slack_user="${SLACK_USER}" \
-		--set slack_webhook_url="${SLACK_WEBHOOK_URL}" \
-		--set support_email_address="${SUPPORT_EMAIL_ADDRESS}" \
-		--set support_phone_number="${SUPPORT_PHONE_NUMBER}" \
-		--set slack_partys_channel="${SLACK_PARTYS_CHANNEL}" \
-		--set slack_orders_channel="${SLACK_ORDERS_CHANNEL}" \
-		--set slack_orders_webhook_url=$(slack_orders_webhook_url) \
-		--set slack_partys_webhook_url=$(slack_partys_webhook_url) \
-		--set test_email_recipient="${TEST_EMAIL_RECIPIENT}" \
+		--set aws.accessKeyId="${CONTACT_API_AWS_ACCESS_KEY_ID}" \
+		--set aws.secretAccessKey="${CONTACT_API_AWS_SECRET_ACCESS_KEY}" \
+		--set aws.secretName="${AWS_SECRET_NAME}" \
+		--set aws.region="${AWS_DEFAULT_REGION}" \
 		--debug
 	@echo $(name)
 
