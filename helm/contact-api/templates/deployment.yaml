@@ -6,7 +6,7 @@ metadata:
     jke/workload: {{ include "contact-api.fullname" . }}
 spec:
   progressDeadlineSeconds: 300
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -24,12 +24,18 @@ spec:
     spec:
       containers:
       - env:
-        - name: AWS_DEFAULT_REGION
-          value: {{ .Values.aws.region }}
         - name: AWS_SECRET_NAME
           value: {{ .Values.aws.secretName }}
+        - name: AWS_DEFAULT_REGION
+          value: {{ .Values.aws.region }}
         - name: LOG_LEVEL
           value: {{ .Values.logLevel }}
+        {{- if eq .Values.global.env "dev" }}
+        - name: AWS_ACCESS_KEY_ID
+          value: {{ .Values.aws.accessKeyId }}
+        - name: AWS_SECRET_ACCESS_KEY
+          value: {{ .Values.aws.secretAccessKey }}
+        {{- end }}
       {{- if eq .Values.global.env "dev" }}
         image: "contact-api:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: Never
