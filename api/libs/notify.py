@@ -129,7 +129,7 @@ class EventRequest:
         self.phone_number = contact_info["phone"]
         self.email = contact_info["email"]
         self.details = contact_info["details"]
-        self.catering = contact_info["catering"]
+        self.catering = contact_info.get("catering", "undefined")
         self.recipient = recipient
 
     def _build_subject(self):
