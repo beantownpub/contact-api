@@ -2,7 +2,7 @@
 
 name := $(subst _,-,$(@D))
 image := contact-api
-# tag := $(shell grep 'appVersion:' $(@D)/Chart.yaml | cut -f 2 -d' ')
+tag := $(shell grep 'appVersion:' helm/contact-api/Chart.yaml | cut -f 2 -d' ')
 port := 5012
 
 SHELL := /bin/bash
@@ -37,18 +37,17 @@ helm/publish:
 		git add contact-api/
 
 ## Deploy contact-api to cluster
-helm/install: helm/context
-	cd helm/contact-api && \
+helm/install:
+	@echo "\033[1;32m. . . Installing contact-api in $(env) . . .\033[1;37m\n"
 	helm upgrade --install contact-api . \
+		--kubeconfig="${HOME}"/.kube/$(kubeconfig) \
 		--namespace $(namespace) \
+		--set aws.regionCode=use1 \
 		--set global.env=$(env) \
+		--set image.tag=$(tag) \
 		--set logLevel=$(log_level) \
-		--set aws.accessKeyId="${CONTACT_API_AWS_ACCESS_KEY_ID}" \
-		--set aws.secretAccessKey="${CONTACT_API_AWS_SECRET_ACCESS_KEY}" \
-		--set aws.secretName="${AWS_SECRET_NAME}" \
-		--set aws.region="${AWS_DEFAULT_REGION}" \
+		--set externalSecrets.enabled=true \
 		--debug
-	@echo $(name)
 
 ## Create db secret
 helm/db_secret: helm/context
@@ -100,32 +99,10 @@ helm/deploy/db: helm/context
 helm/template:
 	helm template  contact-api helm/contact-api/ \
 		--namespace $(namespace) \
-		--set global.env=$(env) \
+		--set aws.regionCode=use1 \
+		--set image.tag=$(tag) \
 		--set logLevel=$(log_level) \
-		--set aws_access_key_id="${AWS_ACCESS_KEY_ID}" \
-		--set aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}" \
-		--set aws_default_region="${AWS_DEFAULT_REGION}" \
-		--set email_recipient="$(email_recipient)" \
-		--set second_email_recipient="${SECOND_EMAIL_RECIPIENT}" \
-		--set slack_channel="${SLACK_WEBHOOK_CHANNEL}" \
-		--set slack_user="${SLACK_USER}" \
-		--set slack_webhook_url="${SLACK_WEBHOOK_URL}" \
-		--set support_email_address="${SUPPORT_EMAIL_ADDRESS}" \
-		--set test_email_recipient="${TEST_EMAIL_RECIPIENT}" \
-		--set support_phone_number="${SUPPORT_PHONE_NUMBER}" \
-		--set slack_partys_channel="${SLACK_PARTYS_CHANNEL}" \
-		--set slack_orders_channel="${SLACK_ORDERS_CHANNEL}" \
-		--set slack_orders_webhook_url=$(slack_orders_webhook_url) \
-		--set slack_partys_webhook_url=$(slack_partys_webhook_url) \
-		--set database.enabled=true \
-		--set postgres.contact_db_name=${CONTACT_DB_NAME} \
-		--set postgres.db_admin_pass=${DB_ADMIN_PASS} \
-		--set postgres.db_admin_user=${DB_ADMIN_USER} \
-		--set postgres.db_pass=${DB_PASS} \
-		--set postgres.db_user=${DB_USER} \
-		--set postgres.menu_db_name=${MENU_DB_NAME} \
-		--set postgres.merch_db_name=${MERCH_DB_NAME} \
-		--set postgres.users_db_name=${USERS_DB_NAME} \
+		--set externalSecrets.enabled=true \
 		--debug
 
 helm/port_forward: helm/context

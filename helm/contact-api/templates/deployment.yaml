@@ -30,6 +30,80 @@ spec:
           value: {{ .Values.aws.region }}
         - name: LOG_LEVEL
           value: {{ .Values.logLevel }}
+
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: AWS_ACCESS_KEY_ID
+
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: AWS_SECRET_ACCESS_KEY
+
+      - name: SLACK_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: slack_webhook_url
+
+      - name: SLACK_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: slack_user
+
+      - name: SLACK_ORDERS_CHANNEL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: slack_orders_channel
+
+      - name: SLACK_ORDERS_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: slack_orders_webhook_url
+
+      - name: SUPPORT_EMAIL_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: support_email_address
+
+      - name: SUPPORT_PHONE_NUMBER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: support_phone_number
+
+      - name: SLACK_PARTYS_CHANNEL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: slack_partys_channel
+
+        - name: SLACK_PARTYS_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: slack_partys_webhook_url
+
+        - name: EMAIL_RECIPIENT
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: email_recipient
+
+        - name: TEST_EMAIL_RECIPIENT
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "contact-api.fullname" . }}
+              key: test_email_recipient
+
+
         {{- if eq .Values.global.env "dev" }}
         - name: AWS_ACCESS_KEY_ID
           value: {{ .Values.aws.accessKeyId }}

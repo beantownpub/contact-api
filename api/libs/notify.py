@@ -10,8 +10,7 @@ from api.libs.utils import add_creation_date
 
 
 LOG = init_logger(os.environ.get("LOG_LEVEL").strip())
-SECRET = get_secret()
-DEFAULT_WEBHOOK = SECRET["slack_webhook_url"]
+DEFAULT_WEBHOOK = os.environ.get("SLACK_WEBHOOK_URL")
 
 class OrderConfirmationException(Exception):
     """Base class for order confirmation exceptions"""
@@ -21,10 +20,10 @@ class OrderConfirmation:
     """Class for sending a confirmation email for a merch order"""
 
 
-    slack_channel = SECRET["slack_orders_channel"]
-    slack_webhook_url = SECRET["slack_orders_webhook_url"]
-    support_email = SECRET["support_email_address"]
-    support_phone = SECRET["support_phone_number"]
+    slack_channel = os.environ.get("SLACK_ORDERS_CHANNEL")
+    slack_webhook_url = os.environ.get("SLACK_ORDERS_WEBHOOK_URL")
+    support_email = os.environ.get("SUPPORT_EMAIL_ADDRESS")
+    support_phone = os.environ.get("SUPPORT_PHONE_NUMBER")
     shipping_price = 6.99
     subject = "Beantown Pub Merch Order Confirmation"
     sender = "Beantown Merch <orders@beantownpub.com>"
@@ -119,8 +118,8 @@ class EventRequest:
     """Class for sending an email for a private event request"""
 
     sender = "Beantown Event <contact@beantownpub.com>"
-    slack_channel = SECRET["slack_partys_channel"]
-    slack_webhook_url = SECRET["slack_partys_webhook_url"]
+    slack_channel = os.environ.get("SLACK_PARTYS_CHANNEL")
+    slack_webhook_url = os.environ.get("SLACK_PARTYS_WEBHOOK_URL")
 
     def __init__(self, contact_info, recipient):
         self.contact_info = add_creation_date(contact_info)

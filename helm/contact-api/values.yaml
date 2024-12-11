@@ -3,11 +3,14 @@ aws:
   accessKeyId:
   secretAccessKey:
   region:
+  regionCode: use1
   secretName:
+externalSecrets:
+  enabled: true
 nameOverride:
 fullnameOverride:
 global:
-  env: dev
+  env:
 image:
   name:
   repository: jalgraves/contact-api
@@ -16,6 +19,8 @@ image:
   tag: ""
 
 containerPort: 5012
+
+
 
 ingress:
   enabled: false
