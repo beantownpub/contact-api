@@ -3,13 +3,10 @@ import os
 import requests
 
 from .logging import init_logger
-from .aws import get_secret
 
-SECRET = get_secret()
-
-URL = SECRET["slack_webhook_url"]
+URL = os.environ.get("SLACK_WEBHOOK_URL")
 # CHANNEL = os.environ.get('SLACK_WEBHOOK_CHANNEL')
-USER = SECRET["slack_user"]
+USER = os.environ.get("SLACK_USER")
 HEADERS = {"Content-type": "application/json"}
 LOG_LEVEL = os.environ.get("LOG_LEVEL").strip()
 LOG = init_logger(LOG_LEVEL)
