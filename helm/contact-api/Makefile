@@ -1,27 +1,7 @@
-.PHONY: all test clean
 
-name := $(subst _,-,$(@D))
 image := contact-api
-tag := $(shell grep 'appVersion:' helm/contact-api/Chart.yaml | cut -f 2 -d' ')
-port := 5012
 
 SHELL := /bin/bash
-
-ifeq ($(env),dev)
-	context = ${DEV_CONTEXT}
-	namespace = ${DEV_NAMESPACE}
-	slack_orders_webhook_url = ${SLACK_ORDERS_WEBHOOK_URL_DEV}
-	slack_partys_webhook_url = ${SLACK_PARTYS_WEBHOOK_URL_DEV}
-	email_recipient = ${TEST_EMAIL_RECIPIENT}
-	log_level ?= DEBUG
-else ifeq ($(env),prod)
-	context = ${PROD_CONTEXT}
-	namespace = ${PROD_NAMESPACE}
-	slack_orders_webhook_url = ${SLACK_ORDERS_WEBHOOK_URL_PROD}
-	slack_partys_webhook_url = ${SLACK_PARTYS_WEBHOOK_URL_PROD}
-	email_recipient = ${EMAIL_RECIPIENT}
-	log_level ?= INFO
-endif
 
 helm/clean:
 		rm helm/contact-api/*.tgz || true
@@ -39,12 +19,12 @@ helm/publish:
 ## Deploy contact-api to cluster
 helm/install:
 	@echo "\033[1;32m. . . Installing contact-api in $(env) . . .\033[1;37m\n"
-	helm upgrade --install contact-api . \
+	helm upgrade --install contact-api helm/contact-api/ \
 		--kubeconfig="${HOME}"/.kube/$(kubeconfig) \
 		--namespace $(namespace) \
 		--set aws.regionCode=use1 \
 		--set global.env=$(env) \
-		--set image.tag=$(tag) \
+		--set image.tag=$(image_tag) \
 		--set logLevel=$(log_level) \
 		--set externalSecrets.enabled=true \
 		--debug
@@ -97,7 +77,7 @@ helm/deploy/db: helm/context
 
 ## Render contact-api templates
 helm/template:
-	helm template  contact-api helm/contact-api/ \
+	helm template contact-api helm/contact-api/ \
 		--namespace $(namespace) \
 		--set aws.regionCode=use1 \
 		--set image.tag=$(tag) \
@@ -107,3 +87,7 @@ helm/template:
 
 helm/port_forward: helm/context
 		kubectl port-forward --namespace $(namespace) svc/contact-api $(port):$(port)
+
+## WTF
+wtf:
+	@echo $(tag)

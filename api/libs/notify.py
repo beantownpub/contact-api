@@ -2,7 +2,7 @@ import os
 
 from datetime import datetime
 
-from api.libs.aws import get_secret, send_message
+from api.libs.aws import send_message
 from api.libs.logging import init_logger
 from api.libs.templates import confirmation_email, event_request_html, event_request_raw
 from api.libs.slack import slack_message

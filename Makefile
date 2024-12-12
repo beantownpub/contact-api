@@ -20,10 +20,12 @@ ifeq ($(env),dev)
 	image_tag = $(tag)-$(hash)
 	context = ${DEV_CONTEXT}
 	namespace = ${DEV_NAMESPACE}
+	log_level = DEBUG
 else ifeq ($(env),prod)
 	image_tag = $(tag)
 	context = ${PROD_CONTEXT}
 	namespace = ${PROD_NAMESPACE}
+	log_level = "INFO"
 else
 	env := dev
 endif
