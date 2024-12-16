@@ -16,6 +16,7 @@ class OrderConfirmationException(Exception):
 
 @AUTH.verify_password
 def verify_password(username, password):
+    LOG.info("Verifying credentials for user %s", username)
     api_username = os.environ.get("API_USERNAME").strip()
     api_password = os.environ.get("API_PASSWORD").strip()
     if username.strip() == api_username and password.strip() == api_password:
@@ -42,12 +43,13 @@ class EventContactAPI(Resource):
         "Error Sending Request. Please try again.",
         "If error persists email request to beantownpubboston@gmail.com",
     ]
-    recipient = os.environ.get("EMAIL_RECIPIENT")
+    recipient = os.environ.get("PRIMARY_EMAIL_RECIPIENT")
     test_recipient = os.environ.get("TEST_EMAIL_RECIPIENT")
+    api_version = os.environ.get("CONTACT_API_VERSION")
 
     @AUTH.login_required
     def get(self, location):
-        version = {"app": "contact_api", "version": "0.1.14", "location": location}
+        version = {"app": "contact_api", "version": api_version, "location": location}
         LOG.info("- ContactAPI | Version: %s", version)
         return Response(json.dumps(version), mimetype="application/json", status=200)
 

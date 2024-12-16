@@ -54,7 +54,6 @@ event_request_html = """<html>
             <tr><td><strong>Phone:</strong></td><td>{}</td></tr>
             <tr><td><strong>Email:</strong></td><td>{}</td></tr>
             <tr><td><strong>Details:</strong></td><td>{}</td></tr>
-            <tr><td><strong>Catering:</strong></td><td>{}</td></tr>
         </table>
     </body>
     </html>
@@ -66,5 +65,4 @@ event_request_raw = """
         Phone: {}
         Email: {}
         Details: {}
-        Catering: {}
     """

@@ -141,8 +141,7 @@ class EventRequest:
             self.name,
             self._format_phone_number(),
             self.email,
-            self.details,
-            self.catering,
+            self.details
         )
         return body
 
@@ -159,8 +158,7 @@ class EventRequest:
             self.name,
             self._format_phone_number(),
             self.email,
-            self.details,
-            self.catering,
+            self.details
         )
         return raw_text
 

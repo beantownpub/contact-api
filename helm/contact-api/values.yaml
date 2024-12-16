@@ -1,12 +1,26 @@
 appName: contact-api
 aws:
-  accessKeyId:
-  secretAccessKey:
-  region: us-east-1
   regionCode: use1
-  secretName:
 externalSecrets:
   enabled: true
+  keys:
+    - API_PASSWORD
+    - API_USERNAME
+    - AWS_ACCESS_KEY_ID
+    - AWS_DEFAULT_REGION
+    - AWS_SECRET_ACCESS_KEY
+    - LOG_LEVEL
+    - PRIMARY_EMAIL_RECIPIENT
+    - SECONDARY_EMAIL_RECIPIENT
+    - SLACK_ORDERS_CHANNEL
+    - SLACK_ORDERS_WEBHOOK_URL
+    - SLACK_PARTYS_CHANNEL
+    - SLACK_PARTYS_WEBHOOK_URL
+    - SLACK_USER
+    - SLACK_WEBHOOK_URL
+    - SUPPORT_EMAIL_ADDRESS
+    - SUPPORT_PHONE_NUMBER
+    - TEST_EMAIL_RECIPIENT
 nameOverride:
 fullnameOverride:
 global:
@@ -20,8 +34,6 @@ image:
 
 containerPort: 5012
 
-
-
 ingress:
   enabled: false
 
@@ -30,11 +42,9 @@ db:
   host:
   port:
 
-logLevel: INFO
 database:
   enabled: false
 
-regionCode: use1
 replicaCount: 1
 resources:
   requests:

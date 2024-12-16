@@ -3,7 +3,7 @@ import os
 from flask import Response, request
 from flask_httpauth import HTTPBasicAuth
 from flask_restful import Resource
-from api.libs.utils import add_creation_date
+from api.libs.utils import add_creation_date, verify_password
 from api.libs.logging import init_logger
 from api.libs.slack import slack_message
 
@@ -14,17 +14,6 @@ os.environ.get("SLACK_WEBHOOK_URL")
 
 class SlackAPIException(Exception):
     """Base  class for order confirmation exceptions"""
-
-
-@AUTH.verify_password
-def verify_password(username, password):
-    api_username = os.environ.get("API_USERNAME").strip()
-    api_password = os.environ.get("API_PASSWORD").strip()
-    if username.strip() == api_username and password.strip() == api_password:
-        verified = True
-    else:
-        verified = False
-    return verified
 
 
 class SlackAPI(Resource):
