@@ -15,6 +15,8 @@ port ?= 5012
 repo ?= jalgraves
 tag ?= $(shell yq eval '.info.version' swagger.yaml)
 hash = $(shell git rev-parse --short HEAD)
+aws_region ?= use1
+aws_profile ?= jalgraves
 
 ifeq ($(env),dev)
 	image_tag = $(tag)-$(hash)
@@ -29,6 +31,17 @@ else ifeq ($(env),prod)
 else
 	env := dev
 endif
+
+## Login to AWS ECR
+ecr/login:
+	export AWS_DEFAULT_PROFILE=$(aws_profile) && \
+	aws ecr get-login-password --region $(aws_region) | docker login --username AWS --password-stdin $(ECR_REGISTRY)
+
+build/ecr:
+	docker build --platform linux/x86_64 -t $(ECR_REGISTRY)/contact-api:$(image_tag) .
+
+push/ecr:
+	docker push $(ECR_REGISTRY)/contact-api:$(image_tag)
 
 context:
 	kubectl config use-context $(context)
